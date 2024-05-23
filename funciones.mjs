@@ -73,15 +73,12 @@ const agregarProducto = (peticion, respuesta)=>{
 }
 const eliminarProducto = async(peticion, respuesta)=>{
     const id = parse(peticion.url).base;
-    const productosActualizados = productosObjeto.productos.filter((producto)=>{
+    productosObjeto.productos = productosObjeto.productos.filter((producto)=>{
         return Number(producto.id) !== Number(id)
     })
     try{
-        const arrayProductosActualizado = JSON.stringify(productosActualizados)
-        const parsearArrayJson = {
-            "productos": arrayProductosActualizado
-        }
-        await writeFile(rutaApiV1, JSON.stringify(parsearArrayJson));
+        await writeFile(rutaApiV1, JSON.stringify(productosObjeto));
+        await parsearJson();
         respuesta.statusCode=201
         respuesta.setHeader('Content-Type', 'text/plain')
         respuesta.end("Producto eliminado correctamente");
@@ -94,4 +91,62 @@ const eliminarProducto = async(peticion, respuesta)=>{
 
 
 }
-export {gestionarProductosJson, gestionarProductoId, parsearJson, agregarProducto, eliminarProducto}
+
+const actualizarProducto = (peticion, respuesta)=>{
+     
+    const id = parse(peticion.url).base;
+    console.log(parse(peticion.url))
+    const productoActualizar = productosObjeto.productos.find((producto)=>{
+       
+        return Number(id) === Number(producto.id)
+    })
+    if(productoActualizar){
+        let datosProducto = '';
+        peticion.on('data', (data)=>{
+            datosProducto+= data
+        })
+        peticion.on('error',(error)=>{
+            console.error(error)
+            respuesta.statusCode=500;
+            respuesta.setHeader('Content-Type', 'text/plain')
+            respuesta.end("No se pudo agregar el producto")
+        })
+        peticion.on('end', async()=>{
+            
+            try{
+                const nuevoProducto = JSON.parse(datosProducto)
+                const productosActualizados = productosObjeto.productos.map((producto)=>{
+                    if(Number(producto.id) === Number(id)){
+                        return{
+                            id: Number(id),
+                            nombre: nuevoProducto.nombre,
+                            marca: nuevoProducto.marca,
+                            categoria: nuevoProducto.categoria,
+                            stock: nuevoProducto.stock
+                        }
+                    }else{
+                        return producto;
+                    }
+                })
+                
+                productosObjeto.productos = productosActualizados
+                await writeFile(rutaApiV1, JSON.stringify(productosObjeto))
+                respuesta.statusCode=201;
+                respuesta.setHeader('Content-Type', 'text/plain')
+                respuesta.end("Se actualizo el producto")
+            }catch(err){
+                console.error(err);
+                respuesta.statusCode=500;
+                respuesta.setHeader('Content-Type', 'text/plain')
+                respuesta.end("No se pudo actualizar el producto")
+            }
+        })
+    }
+    
+}
+
+
+
+
+
+export {gestionarProductosJson, gestionarProductoId, parsearJson, agregarProducto, eliminarProducto, actualizarProducto}

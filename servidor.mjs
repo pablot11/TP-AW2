@@ -1,16 +1,6 @@
 import http from 'node:http';
-import {gestionarProductosJson, gestionarProductoId, agregarProducto, eliminarProducto} from './funciones.mjs'
-import path from 'node:path'
+import {gestionarProductosJson, gestionarProductoId, agregarProducto, eliminarProducto, actualizarProducto} from './funciones.mjs'
 const PUERTO = 3000;
-const parsearJson = async()=>{
-    try{
-        const datosProductos = await readFile(rutaApiV1, 'utf-8')
-        return JSON.parse(datosProductos) 
-    }catch(err){
-        console.log(err)
-    }
-}
-parsearJson();
 const servidor = http.createServer((peticion, respuesta)=>{
     const METODO = peticion.method;
     const URL = peticion.url;
@@ -29,7 +19,10 @@ const servidor = http.createServer((peticion, respuesta)=>{
             respuesta.end("No se encontro la URL")
         }
     }else if(METODO === 'PUT'){
-
+        if(URL.match('/productos')){
+            actualizarProducto(peticion, respuesta)
+        }
+        
     }else if (METODO === 'DELETE'){
         if(URL.match('/productos')){
             eliminarProducto(peticion, respuesta);
@@ -46,4 +39,3 @@ const servidor = http.createServer((peticion, respuesta)=>{
 })
 
 servidor.listen(PUERTO)
-export {parsearJson}
