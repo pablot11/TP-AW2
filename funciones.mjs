@@ -95,7 +95,6 @@ const eliminarProducto = async(peticion, respuesta)=>{
 const actualizarProducto = (peticion, respuesta)=>{
      
     const id = parse(peticion.url).base;
-    console.log(parse(peticion.url))
     const productoActualizar = productosObjeto.productos.find((producto)=>{
        
         return Number(id) === Number(producto.id)
