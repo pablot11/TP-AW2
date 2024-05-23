@@ -1,0 +1,25 @@
+{
+  "productos": [
+    {
+      "id": 1,
+      "nombre": "Teclado Mecánico",
+      "marca": "Logitech",
+      "categoria": "Pér",
+      "stock": 40
+    },
+    {
+      "id": 2,
+      "nombre": "Tarjeta Gráfica",
+      "marca": "AMD",
+      "categoria": "Componentes de Hardware",
+      "stock": 25
+    },
+    {
+      "id": 3,
+      "nombre": "Monitor 27 4K",
+      "marca": "Dell",
+      "categoria": "Monitores y Pantallas",
+      "stock": 15
+    }
+  ]
+}
