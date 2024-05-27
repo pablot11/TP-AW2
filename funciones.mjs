@@ -62,7 +62,7 @@ const agregarProducto = (peticion, respuesta)=>{
             await writeFile(rutaApiV1, JSON.stringify(productosObjeto))
             respuesta.statusCode=201;
             respuesta.setHeader('Content-Type', 'text/plain')
-            respuesta.end("Se creo el nuevo producto")
+            respuesta.end(JSON.stringify(nuevoProducto))
         }catch(err){
             console.error(err);
             respuesta.statusCode=500;
@@ -73,12 +73,16 @@ const agregarProducto = (peticion, respuesta)=>{
 }
 const eliminarProducto = async(peticion, respuesta)=>{
     const id = parse(peticion.url).base;
-    productosObjeto.productos = productosObjeto.productos.filter((producto)=>{
+    const existe = productosObjeto.productos.find(producto => Number(producto.id) === Number(id))
+    if(existe){
+        productosObjeto.productos = productosObjeto.productos.filter((producto)=>{
         return Number(producto.id) !== Number(id)
     })
     try{
-        await writeFile(rutaApiV1, JSON.stringify(productosObjeto));
-        await parsearJson();
+          const respuestaJSON = {
+            "productos": productosObjeto.productos            
+        };
+        await writeFile(rutaApiV1, JSON.stringify(respuestaJSON));
         respuesta.statusCode=201
         respuesta.setHeader('Content-Type', 'text/plain')
         respuesta.end("Producto eliminado correctamente");
@@ -88,8 +92,11 @@ const eliminarProducto = async(peticion, respuesta)=>{
         respuesta.setHeader('Content-Type', 'text/plain')
         respuesta.end("Error al querer eliminar el producto");
     }
-
-
+    }else{
+        respuesta.statusCode=404
+        respuesta.setHeader('Content-Type', 'text/plain')
+        respuesta.end("El producto que desea eliminar no existe");
+    }
 }
 
 const actualizarProducto = (peticion, respuesta)=>{
@@ -143,9 +150,5 @@ const actualizarProducto = (peticion, respuesta)=>{
     }
     
 }
-
-
-
-
 
 export {gestionarProductosJson, gestionarProductoId, parsearJson, agregarProducto, eliminarProducto, actualizarProducto}
