@@ -18,6 +18,7 @@ const gestionarProductosJson = async(respuesta)=>{
     try{
         respuesta.statusCode=200;
         respuesta.setHeader('Content-Type', 'application/json')
+        respuesta.setHeader('Access-Control-Allow-Origin', '*')
         respuesta.end(JSON.stringify(productosObjeto))
     }catch(err){
         respuesta.statusCode=404;
@@ -58,6 +59,7 @@ const agregarProducto = (peticion, respuesta)=>{
     peticion.on('end', async()=>{
         try{
             const nuevoProducto = JSON.parse(datosProducto)
+            console.log(nuevoProducto)
             productosObjeto.productos.push(nuevoProducto)
             await writeFile(rutaApiV1, JSON.stringify(productosObjeto))
             respuesta.statusCode=201;
