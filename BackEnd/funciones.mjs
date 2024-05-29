@@ -37,6 +37,7 @@ const gestionarProductoId = (peticion,respuesta)=>{
         const respuestaProducto = JSON.stringify(producto)
         respuesta.statusCode=200;
         respuesta.setHeader('Content-Type', 'application/json')
+        respuesta.setHeader('Access-Control-Allow-Origin', '*')
         respuesta.end(respuestaProducto)
     }else{
         respuesta.statusCode=404;
@@ -58,8 +59,17 @@ const agregarProducto = (peticion, respuesta)=>{
     })
     peticion.on('end', async()=>{
         try{
-            const nuevoProducto = JSON.parse(datosProducto)
-            console.log(nuevoProducto)
+            const ultimoProducto = productosObjeto.productos[productosObjeto.productos.length - 1]
+            const ultimodId = ultimoProducto.id + 1;
+            const datosNuevoProducto = JSON.parse(datosProducto)
+            const nuevoProducto = 
+            {
+                    id: ultimodId,
+                    nombre: datosNuevoProducto.nombre,
+                    marca: datosNuevoProducto.marca,
+                    categoria: datosNuevoProducto.categoria,
+                    stock: datosNuevoProducto.stock
+            }
             productosObjeto.productos.push(nuevoProducto)
             await writeFile(rutaApiV1, JSON.stringify(productosObjeto))
             respuesta.statusCode=201;
@@ -87,6 +97,7 @@ const eliminarProducto = async(peticion, respuesta)=>{
         await writeFile(rutaApiV1, JSON.stringify(respuestaJSON));
         respuesta.statusCode=201
         respuesta.setHeader('Content-Type', 'text/plain')
+        respuesta.setHeader('Access-Control-Allow-Origin', '*')
         respuesta.end("Producto eliminado correctamente");
     }catch(err){
         console.error(err);
@@ -141,6 +152,7 @@ const actualizarProducto = (peticion, respuesta)=>{
                 await writeFile(rutaApiV1, JSON.stringify(productosObjeto))
                 respuesta.statusCode=201;
                 respuesta.setHeader('Content-Type', 'text/plain')
+                respuesta.setHeader('Access-Control-Allow-Origin', '*')
                 respuesta.end("Se actualizo el producto")
             }catch(err){
                 console.error(err);
@@ -153,4 +165,19 @@ const actualizarProducto = (peticion, respuesta)=>{
     
 }
 
-export {gestionarProductosJson, gestionarProductoId, parsearJson, agregarProducto, eliminarProducto, actualizarProducto}
+const gestionarPreFlight = (respuesta)=>{
+    try{
+        respuesta.statusCode=204;
+        respuesta.setHeader('Access-Control-Allow-Origin', '*')
+        respuesta.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+        respuesta.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+        respuesta.end()
+    }catch(err){
+        respuesta.statusCode=403
+        respuesta.setHeader('Content-Type', 'text/plain')
+        respuesta.end("Error en el servidor");
+    }
+    
+}
+
+export {gestionarProductosJson, gestionarProductoId, parsearJson, agregarProducto, eliminarProducto, actualizarProducto, gestionarPreFlight}
