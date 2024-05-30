@@ -17,6 +17,15 @@ async function traerProducto(idProducto){
 
 async function cargarDatosFormulario(producto){
     let html = '';
+      const categorias = ['Hardware', 'Periféricos', 'Sonido'];
+
+        let opcionesCategoria = categorias.map(categoria => {
+            if (categoria !== producto.categoria) {
+                return `<option value="${categoria}">${categoria}</option>`;
+            }else{
+                return `<option value="${categoria}" disabled selected>${categoria}</option>`;
+            }
+        }).join('');
     html = `
          <form action="http://localhost:3000/productos" method="POST" id="formulario">
             <label for="">Nombre</label>
@@ -26,10 +35,12 @@ async function cargarDatosFormulario(producto){
             <input type="text" name="marca" value="${producto.marca}">
             <br>
             <label for="">Categoria</label>
-            <input type="text" name="categoria" value="${producto.categoria}"> 
-            <br>
+            <select name="categoria" id="">
+                ${opcionesCategoria}
+            </select>
             <label for="">Stock</label>
             <input type="number" name="stock" value="${producto.stock}">
+            <br>
             <button type"submit">Modificar</button>
             <br>
   
@@ -58,21 +69,11 @@ async function peticionCliente(datosCuerpo){
                 body: datosCuerpo
             }
         )
+
+    window.location.href='/'
 }
 
-botonEliminar.addEventListener('click', (e)=>{
-    e.preventDefault()
-    eliminarProducto();
-})
 
-async function eliminarProducto(){
-    const producto = fetch(`http://localhost:3000/productos/${idProducto}`,
-    {
-        method:'DELETE'
-
-    })
-    window.location.href='./'
-}
 
 traerProducto(idProducto)
 
